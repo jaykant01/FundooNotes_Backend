@@ -1,0 +1,569 @@
+2026-07-08 23:16:00.097 +05:30 [INF] Executed DbCommand (77ms) [Parameters=[], CommandType='"Text"', CommandTimeout='60']
+CREATE DATABASE [FundooNotesDb];
+2026-07-08 23:16:00.168 +05:30 [INF] Executed DbCommand (29ms) [Parameters=[], CommandType='"Text"', CommandTimeout='60']
+IF SERVERPROPERTY('EngineEdition') <> 5
+BEGIN
+    ALTER DATABASE [FundooNotesDb] SET READ_COMMITTED_SNAPSHOT ON;
+END;
+2026-07-08 23:16:00.183 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2026-07-08 23:16:00.226 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [__EFMigrationsHistory] (
+    [MigrationId] nvarchar(150) NOT NULL,
+    [ProductVersion] nvarchar(32) NOT NULL,
+    CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+);
+2026-07-08 23:16:00.227 +05:30 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT 1
+2026-07-08 23:16:00.238 +05:30 [INF] Executed DbCommand (9ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+2026-07-08 23:16:00.247 +05:30 [INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [MigrationId], [ProductVersion]
+FROM [__EFMigrationsHistory]
+ORDER BY [MigrationId];
+2026-07-08 23:16:00.258 +05:30 [INF] Applying migration '20260330060903_InitialFundooDb'.
+2026-07-08 23:16:00.287 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Users] (
+    [UserId] int NOT NULL IDENTITY,
+    [FirstName] nvarchar(50) NOT NULL,
+    [LastName] nvarchar(50) NULL,
+    [Email] nvarchar(100) NOT NULL,
+    [HashPassword] nvarchar(max) NOT NULL,
+    [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+    [ModifiedAt] datetime2 NULL,
+    CONSTRAINT [PK_Users] PRIMARY KEY ([UserId])
+);
+2026-07-08 23:16:00.289 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Labels] (
+    [LabelId] int NOT NULL IDENTITY,
+    [UserId] int NOT NULL,
+    [LabelName] nvarchar(100) NOT NULL,
+    CONSTRAINT [PK_Labels] PRIMARY KEY ([LabelId]),
+    CONSTRAINT [FK_Labels_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([UserId]) ON DELETE CASCADE
+);
+2026-07-08 23:16:00.291 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Notes] (
+    [NoteId] int NOT NULL IDENTITY,
+    [UserId] int NOT NULL,
+    [Title] nvarchar(200) NULL,
+    [Description] nvarchar(max) NULL,
+    [Color] nvarchar(max) NULL DEFAULT N'#FFFFFF',
+    [Image] nvarchar(max) NULL,
+    [IsArchived] bit NOT NULL DEFAULT CAST(0 AS bit),
+    [IsTrashed] bit NOT NULL DEFAULT CAST(0 AS bit),
+    [IsPinned] bit NOT NULL DEFAULT CAST(0 AS bit),
+    [CreatedAt] datetime2 NOT NULL DEFAULT (GETUTCDATE()),
+    [ModifiedAt] datetime2 NULL,
+    CONSTRAINT [PK_Notes] PRIMARY KEY ([NoteId]),
+    CONSTRAINT [FK_Notes_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [Users] ([UserId]) ON DELETE CASCADE
+);
+2026-07-08 23:16:00.292 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [Collaborators] (
+    [CollaboratorId] int NOT NULL IDENTITY,
+    [NoteId] int NOT NULL,
+    [OwnerId] int NOT NULL,
+    [CollaboratorEmail] nvarchar(100) NOT NULL,
+    CONSTRAINT [PK_Collaborators] PRIMARY KEY ([CollaboratorId]),
+    CONSTRAINT [FK_Collaborators_Notes_NoteId] FOREIGN KEY ([NoteId]) REFERENCES [Notes] ([NoteId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_Collaborators_Users_OwnerId] FOREIGN KEY ([OwnerId]) REFERENCES [Users] ([UserId])
+);
+2026-07-08 23:16:00.293 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE TABLE [NoteLabels] (
+    [LabelsLabelId] int NOT NULL,
+    [NotesNoteId] int NOT NULL,
+    CONSTRAINT [PK_NoteLabels] PRIMARY KEY ([LabelsLabelId], [NotesNoteId]),
+    CONSTRAINT [FK_NoteLabels_Labels_LabelsLabelId] FOREIGN KEY ([LabelsLabelId]) REFERENCES [Labels] ([LabelId]) ON DELETE CASCADE,
+    CONSTRAINT [FK_NoteLabels_Notes_NotesNoteId] FOREIGN KEY ([NotesNoteId]) REFERENCES [Notes] ([NoteId])
+);
+2026-07-08 23:16:00.294 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_Collaborators_NoteId] ON [Collaborators] ([NoteId]);
+2026-07-08 23:16:00.295 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_Collaborators_OwnerId] ON [Collaborators] ([OwnerId]);
+2026-07-08 23:16:00.296 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_Labels_UserId] ON [Labels] ([UserId]);
+2026-07-08 23:16:00.329 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_NoteLabels_NotesNoteId] ON [NoteLabels] ([NotesNoteId]);
+2026-07-08 23:16:00.330 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE INDEX [IX_Notes_UserId] ON [Notes] ([UserId]);
+2026-07-08 23:16:00.333 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+CREATE UNIQUE INDEX [IX_Users_Email] ON [Users] ([Email]);
+2026-07-08 23:16:00.337 +05:30 [INF] Executed DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20260330060903_InitialFundooDb', N'8.0.25');
+2026-07-08 23:16:00.345 +05:30 [INF] Applying migration '20260331064636_AddResetTokenToUser'.
+2026-07-08 23:16:00.360 +05:30 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [Users] ADD [ResetToken] nvarchar(200) NULL;
+2026-07-08 23:16:00.361 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+ALTER TABLE [Users] ADD [ResetTokenExpiry] datetime2 NULL;
+2026-07-08 23:16:00.362 +05:30 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20260331064636_AddResetTokenToUser', N'8.0.25');
+2026-07-08 23:16:18.794 +05:30 [INF] User profile is available. Using 'C:\Users\jayka\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-07-08 23:16:19.177 +05:30 [INF] Now listening on: https://localhost:7229
+2026-07-08 23:16:19.180 +05:30 [INF] Now listening on: http://localhost:5062
+2026-07-08 23:16:19.274 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-07-08 23:16:19.277 +05:30 [INF] Hosting environment: Development
+2026-07-08 23:16:19.279 +05:30 [INF] Content root path: C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes
+2026-07-08 23:16:26.358 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/index.html - null null
+2026-07-08 23:16:26.856 +05:30 [INF] HTTP GET /swagger/index.html responded 200 in 145.7710 ms
+2026-07-08 23:16:26.860 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_vs/browserLink - null null
+2026-07-08 23:16:26.861 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/swagger-ui-standalone-preset.js - null null
+2026-07-08 23:16:26.860 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/swagger-ui.css - null null
+2026-07-08 23:16:26.884 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/index.html - 200 null text/html;charset=utf-8 545.4713ms
+2026-07-08 23:16:26.860 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/swagger-ui-bundle.js - null null
+2026-07-08 23:16:26.866 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - null null
+2026-07-08 23:16:26.902 +05:30 [INF] The file /swagger-ui-standalone-preset.js was not modified
+2026-07-08 23:16:26.902 +05:30 [INF] The file /swagger-ui.css was not modified
+2026-07-08 23:16:26.926 +05:30 [INF] HTTP GET /swagger/swagger-ui-standalone-preset.js responded 304 in 36.9729 ms
+2026-07-08 23:16:26.911 +05:30 [INF] The file /swagger-ui-bundle.js was not modified
+2026-07-08 23:16:26.933 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/swagger-ui-standalone-preset.js - 304 null text/javascript 71.8795ms
+2026-07-08 23:16:26.927 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - 200 14927 application/javascript; charset=utf-8 61.4489ms
+2026-07-08 23:16:26.928 +05:30 [INF] HTTP GET /swagger/swagger-ui.css responded 304 in 27.7255 ms
+2026-07-08 23:16:26.935 +05:30 [INF] HTTP GET /swagger/swagger-ui-bundle.js responded 304 in 23.8976 ms
+2026-07-08 23:16:26.956 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/swagger-ui.css - 304 null text/css 96.6605ms
+2026-07-08 23:16:26.963 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/swagger-ui-bundle.js - 304 null text/javascript 103.0369ms
+2026-07-08 23:16:26.965 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_vs/browserLink - 200 null text/javascript; charset=UTF-8 104.7864ms
+2026-07-08 23:16:27.175 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - null null
+2026-07-08 23:16:27.200 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/favicon-32x32.png - null null
+2026-07-08 23:16:27.209 +05:30 [INF] The file /favicon-32x32.png was not modified
+2026-07-08 23:16:27.210 +05:30 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 28.6548 ms
+2026-07-08 23:16:27.211 +05:30 [INF] HTTP GET /swagger/favicon-32x32.png responded 304 in 2.8962 ms
+2026-07-08 23:16:27.218 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 43.5646ms
+2026-07-08 23:16:27.220 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/favicon-32x32.png - 304 null image/png 20.8642ms
+2026-07-08 23:17:11.226 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/User/register - null null
+2026-07-08 23:17:11.241 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:17:11.247 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/User/register - 204 null null 21.0958ms
+2026-07-08 23:17:11.252 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/User/register - application/json 128
+2026-07-08 23:17:11.277 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:17:11.292 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.UserController.Register (FundooNotes)'
+2026-07-08 23:17:11.375 +05:30 [INF] Route matched with {action = "Register", controller = "User"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Register(FundooNotes.Models.DTOs.UserRegisterDTO) on controller FundooNotes.Controllers.UserController (FundooNotes).
+2026-07-08 23:17:13.886 +05:30 [INF] Executed DbCommand (91ms) [Parameters=[@__email_0='?' (Size = 100)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FirstName], [u].[HashPassword], [u].[LastName], [u].[ModifiedAt], [u].[ResetToken], [u].[ResetTokenExpiry]
+FROM [Users] AS [u]
+WHERE [u].[Email] = @__email_0
+2026-07-08 23:17:14.630 +05:30 [INF] Executed DbCommand (15ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 100), @p2='?' (Size = 50), @p3='?' (Size = 4000), @p4='?' (Size = 50), @p5='?' (DbType = DateTime2), @p6='?' (Size = 200), @p7='?' (DbType = DateTime2)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Users] ([CreatedAt], [Email], [FirstName], [HashPassword], [LastName], [ModifiedAt], [ResetToken], [ResetTokenExpiry])
+OUTPUT INSERTED.[UserId]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+2026-07-08 23:17:14.699 +05:30 [INF] Executing OkObjectResult, writing value of type 'FundooNotes.Models.DTOs.ResponseDTO'.
+2026-07-08 23:17:14.714 +05:30 [INF] Executed action FundooNotes.Controllers.UserController.Register (FundooNotes) in 3326.7367ms
+2026-07-08 23:17:14.718 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.UserController.Register (FundooNotes)'
+2026-07-08 23:17:14.721 +05:30 [INF] HTTP POST /api/User/register responded 200 in 3439.8077 ms
+2026-07-08 23:17:14.734 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/User/register - 200 null application/json; charset=utf-8 3481.6915ms
+2026-07-08 23:17:20.597 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/User/login - null null
+2026-07-08 23:17:20.601 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:17:20.602 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/User/login - 204 null null 5.1402ms
+2026-07-08 23:17:20.604 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/User/login - application/json 58
+2026-07-08 23:17:20.612 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:17:20.613 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-07-08 23:17:20.620 +05:30 [INF] Route matched with {action = "Login", controller = "User"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(FundooNotes.Models.DTOs.UserLoginDTO) on controller FundooNotes.Controllers.UserController (FundooNotes).
+2026-07-08 23:17:20.662 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[@__email_0='?' (Size = 100)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FirstName], [u].[HashPassword], [u].[LastName], [u].[ModifiedAt], [u].[ResetToken], [u].[ResetTokenExpiry]
+FROM [Users] AS [u]
+WHERE [u].[Email] = @__email_0
+2026-07-08 23:17:21.078 +05:30 [INF] Executing OkObjectResult, writing value of type 'FundooNotes.Models.DTOs.ResponseDTO'.
+2026-07-08 23:17:21.088 +05:30 [INF] Executed action FundooNotes.Controllers.UserController.Login (FundooNotes) in 463.9495ms
+2026-07-08 23:17:21.090 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-07-08 23:17:21.091 +05:30 [INF] HTTP POST /api/User/login responded 200 in 478.7637 ms
+2026-07-08 23:17:21.097 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/User/login - 200 null application/json; charset=utf-8 492.9543ms
+2026-07-08 23:17:21.113 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:17:21.119 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:17:21.122 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/Notes/getall - 204 null null 9.2165ms
+2026-07-08 23:17:21.127 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:17:21.247 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:17:21.270 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes)'
+2026-07-08 23:17:21.284 +05:30 [INF] Route matched with {action = "GetAllNotes", controller = "Notes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllNotes() on controller FundooNotes.Controllers.NotesController (FundooNotes).
+2026-07-08 23:17:35.676 +05:30 [INF] Executed action FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes) in 14386.0678ms
+2026-07-08 23:17:35.680 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes)'
+2026-07-08 23:17:35.683 +05:30 [ERR] HTTP GET /api/Notes/getall responded 500 in 14430.7670 ms
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=HMGET, timeout: 5000, inst: 0, qu: 0, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 1, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=5,QueuedItems=0,CompletedItems=359,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAndRefreshAsync(String key, Boolean getData, CancellationToken token)
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAsync(String key, CancellationToken token)
+   at Microsoft.Extensions.Caching.Distributed.DistributedCacheExtensions.GetStringAsync(IDistributedCache cache, String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.GetAllNotes(Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 50
+   at FundooNotes.Controllers.NotesController.GetAllNotes() in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 39
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-07-08 23:17:35.758 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=HMGET, timeout: 5000, inst: 0, qu: 0, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 1, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=5,QueuedItems=0,CompletedItems=359,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAndRefreshAsync(String key, Boolean getData, CancellationToken token)
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAsync(String key, CancellationToken token)
+   at Microsoft.Extensions.Caching.Distributed.DistributedCacheExtensions.GetStringAsync(IDistributedCache cache, String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.GetAllNotes(Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 50
+   at FundooNotes.Controllers.NotesController.GetAllNotes() in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 39
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-07-08 23:17:35.777 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/api/Notes/getall - 500 null text/plain; charset=utf-8 14650.0698ms
+2026-07-08 23:18:06.098 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:18:06.114 +05:30 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+2026-07-08 23:18:06.123 +05:30 [INF] AuthenticationScheme: Bearer was challenged.
+2026-07-08 23:18:06.127 +05:30 [INF] HTTP GET /api/Notes/getall responded 401 in 15.0630 ms
+2026-07-08 23:18:06.135 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/api/Notes/getall - 401 null null 36.8202ms
+2026-07-08 23:18:17.474 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/Notes/create - null null
+2026-07-08 23:18:17.479 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:18:17.481 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/Notes/create - 204 null null 6.7115ms
+2026-07-08 23:18:17.483 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/Notes/create - application/json 113
+2026-07-08 23:18:17.489 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:18:17.493 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.NotesController.CreateNote (FundooNotes)'
+2026-07-08 23:18:17.502 +05:30 [INF] Route matched with {action = "CreateNote", controller = "Notes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] CreateNote(FundooNotes.Models.DTOs.NoteDTO) on controller FundooNotes.Controllers.NotesController (FundooNotes).
+2026-07-08 23:18:17.690 +05:30 [INF] Executed DbCommand (10ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2), @p5='?' (Size = 200), @p6='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Notes] ([Color], [CreatedAt], [Description], [Image], [ModifiedAt], [Title], [UserId])
+OUTPUT INSERTED.[NoteId], INSERTED.[IsArchived], INSERTED.[IsPinned], INSERTED.[IsTrashed]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+2026-07-08 23:18:19.879 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/Notes/create - application/json 113
+2026-07-08 23:18:19.887 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:18:19.889 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.NotesController.CreateNote (FundooNotes)'
+2026-07-08 23:18:19.891 +05:30 [INF] Route matched with {action = "CreateNote", controller = "Notes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] CreateNote(FundooNotes.Models.DTOs.NoteDTO) on controller FundooNotes.Controllers.NotesController (FundooNotes).
+2026-07-08 23:18:19.906 +05:30 [INF] Executed DbCommand (5ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2), @p5='?' (Size = 200), @p6='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Notes] ([Color], [CreatedAt], [Description], [Image], [ModifiedAt], [Title], [UserId])
+OUTPUT INSERTED.[NoteId], INSERTED.[IsArchived], INSERTED.[IsPinned], INSERTED.[IsTrashed]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+2026-07-08 23:18:20.694 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/Notes/create - application/json 113
+2026-07-08 23:18:20.701 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:18:20.703 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.NotesController.CreateNote (FundooNotes)'
+2026-07-08 23:18:20.705 +05:30 [INF] Route matched with {action = "CreateNote", controller = "Notes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] CreateNote(FundooNotes.Models.DTOs.NoteDTO) on controller FundooNotes.Controllers.NotesController (FundooNotes).
+2026-07-08 23:18:20.722 +05:30 [INF] Executed DbCommand (8ms) [Parameters=[@p0='?' (Size = 4000), @p1='?' (DbType = DateTime2), @p2='?' (Size = 4000), @p3='?' (Size = 4000), @p4='?' (DbType = DateTime2), @p5='?' (Size = 200), @p6='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Notes] ([Color], [CreatedAt], [Description], [Image], [ModifiedAt], [Title], [UserId])
+OUTPUT INSERTED.[NoteId], INSERTED.[IsArchived], INSERTED.[IsPinned], INSERTED.[IsTrashed]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+2026-07-08 23:18:23.634 +05:30 [INF] Executed action FundooNotes.Controllers.NotesController.CreateNote (FundooNotes) in 6126.6013ms
+2026-07-08 23:18:23.636 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.NotesController.CreateNote (FundooNotes)'
+2026-07-08 23:18:23.638 +05:30 [ERR] HTTP POST /api/Notes/create responded 500 in 6147.2321 ms
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=DEL, timeout: 5000, inst: 0, qu: 2, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 4, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=0,CompletedItems=627,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.RemoveAsync(String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.CreateNote(NoteDTO dto, Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 35
+   at FundooNotes.Controllers.NotesController.CreateNote(NoteDTO dto) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 29
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-07-08 23:18:23.647 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=DEL, timeout: 5000, inst: 0, qu: 2, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 4, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=0,CompletedItems=627,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.RemoveAsync(String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.CreateNote(NoteDTO dto, Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 35
+   at FundooNotes.Controllers.NotesController.CreateNote(NoteDTO dto) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 29
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-07-08 23:18:23.660 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/Notes/create - 500 null text/plain; charset=utf-8 6177.329ms
+2026-07-08 23:18:24.746 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:18:24.756 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:18:24.758 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/Notes/getall - 204 null null 12.5642ms
+2026-07-08 23:18:24.763 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:18:24.777 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:18:24.779 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes)'
+2026-07-08 23:18:24.781 +05:30 [INF] Route matched with {action = "GetAllNotes", controller = "Notes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllNotes() on controller FundooNotes.Controllers.NotesController (FundooNotes).
+2026-07-08 23:18:25.618 +05:30 [INF] Executed action FundooNotes.Controllers.NotesController.CreateNote (FundooNotes) in 5725.1219ms
+2026-07-08 23:18:25.624 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.NotesController.CreateNote (FundooNotes)'
+2026-07-08 23:18:25.629 +05:30 [ERR] HTTP POST /api/Notes/create responded 500 in 5740.5460 ms
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=DEL, timeout: 5000, inst: 0, qu: 2, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Initializing, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 5, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=2,Free=32765,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=1,CompletedItems=660,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.RemoveAsync(String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.CreateNote(NoteDTO dto, Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 35
+   at FundooNotes.Controllers.NotesController.CreateNote(NoteDTO dto) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 29
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-07-08 23:18:25.646 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=DEL, timeout: 5000, inst: 0, qu: 2, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Initializing, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 5, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=2,Free=32765,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=1,CompletedItems=660,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.RemoveAsync(String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.CreateNote(NoteDTO dto, Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 35
+   at FundooNotes.Controllers.NotesController.CreateNote(NoteDTO dto) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 29
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-07-08 23:18:25.666 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/Notes/create - 500 null text/plain; charset=utf-8 5787.9323ms
+2026-07-08 23:18:26.604 +05:30 [INF] Executed action FundooNotes.Controllers.NotesController.CreateNote (FundooNotes) in 5895.2064ms
+2026-07-08 23:18:26.607 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.NotesController.CreateNote (FundooNotes)'
+2026-07-08 23:18:26.610 +05:30 [ERR] HTTP POST /api/Notes/create responded 500 in 5907.2657 ms
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=DEL, timeout: 5000, inst: 0, qu: 1, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 5, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=0,CompletedItems=667,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.RemoveAsync(String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.CreateNote(NoteDTO dto, Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 35
+   at FundooNotes.Controllers.NotesController.CreateNote(NoteDTO dto) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 29
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-07-08 23:18:26.623 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=DEL, timeout: 5000, inst: 0, qu: 1, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 5, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=0,CompletedItems=667,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.RemoveAsync(String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.CreateNote(NoteDTO dto, Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 35
+   at FundooNotes.Controllers.NotesController.CreateNote(NoteDTO dto) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 29
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-07-08 23:18:26.633 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/Notes/create - 500 null text/plain; charset=utf-8 5939.7165ms
+2026-07-08 23:18:30.713 +05:30 [INF] Executed action FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes) in 5929.2222ms
+2026-07-08 23:18:30.721 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes)'
+2026-07-08 23:18:30.725 +05:30 [ERR] HTTP GET /api/Notes/getall responded 500 in 5947.0415 ms
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=HMGET, timeout: 5000, inst: 0, qu: 0, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 5, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=0,CompletedItems=684,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAndRefreshAsync(String key, Boolean getData, CancellationToken token)
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAsync(String key, CancellationToken token)
+   at Microsoft.Extensions.Caching.Distributed.DistributedCacheExtensions.GetStringAsync(IDistributedCache cache, String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.GetAllNotes(Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 50
+   at FundooNotes.Controllers.NotesController.GetAllNotes() in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 39
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-07-08 23:18:30.744 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=HMGET, timeout: 5000, inst: 0, qu: 0, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 5, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=7,QueuedItems=0,CompletedItems=684,Timers=6), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAndRefreshAsync(String key, Boolean getData, CancellationToken token)
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAsync(String key, CancellationToken token)
+   at Microsoft.Extensions.Caching.Distributed.DistributedCacheExtensions.GetStringAsync(IDistributedCache cache, String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.GetAllNotes(Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 50
+   at FundooNotes.Controllers.NotesController.GetAllNotes() in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 39
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-07-08 23:18:30.759 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/api/Notes/getall - 500 null text/plain; charset=utf-8 5997.9758ms
+2026-07-08 23:52:04.436 +05:30 [INF] User profile is available. Using 'C:\Users\jayka\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-07-08 23:52:04.916 +05:30 [INF] Now listening on: https://localhost:7229
+2026-07-08 23:52:04.919 +05:30 [INF] Now listening on: http://localhost:5062
+2026-07-08 23:52:05.265 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-07-08 23:52:05.269 +05:30 [INF] Hosting environment: Development
+2026-07-08 23:52:05.270 +05:30 [INF] Content root path: C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes
+2026-07-08 23:52:10.880 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/index.html - null null
+2026-07-08 23:52:11.376 +05:30 [INF] HTTP GET /swagger/index.html responded 200 in 138.8363 ms
+2026-07-08 23:52:11.387 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - null null
+2026-07-08 23:52:11.387 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_vs/browserLink - null null
+2026-07-08 23:52:11.400 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/index.html - 200 null text/html;charset=utf-8 537.3059ms
+2026-07-08 23:52:11.410 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - 200 14927 application/javascript; charset=utf-8 24.1051ms
+2026-07-08 23:52:11.602 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_vs/browserLink - 200 null text/javascript; charset=UTF-8 214.6901ms
+2026-07-08 23:52:11.638 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - null null
+2026-07-08 23:52:11.682 +05:30 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 33.0860 ms
+2026-07-08 23:52:11.688 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 51.1181ms
+2026-07-08 23:53:37.810 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/User/login - null null
+2026-07-08 23:53:37.837 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:53:37.843 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/User/login - 204 null null 33.6982ms
+2026-07-08 23:53:37.847 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/User/login - application/json 58
+2026-07-08 23:53:37.861 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:53:37.873 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-07-08 23:53:37.931 +05:30 [INF] Route matched with {action = "Login", controller = "User"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(FundooNotes.Models.DTOs.UserLoginDTO) on controller FundooNotes.Controllers.UserController (FundooNotes).
+2026-07-08 23:53:40.604 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/User/login - application/json 58
+2026-07-08 23:53:40.609 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:53:40.610 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-07-08 23:53:40.612 +05:30 [INF] Route matched with {action = "Login", controller = "User"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(FundooNotes.Models.DTOs.UserLoginDTO) on controller FundooNotes.Controllers.UserController (FundooNotes).
+2026-07-08 23:53:41.508 +05:30 [INF] Executed DbCommand (86ms) [Parameters=[@__email_0='?' (Size = 100)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FirstName], [u].[HashPassword], [u].[LastName], [u].[ModifiedAt], [u].[ResetToken], [u].[ResetTokenExpiry]
+FROM [Users] AS [u]
+WHERE [u].[Email] = @__email_0
+2026-07-08 23:53:41.508 +05:30 [INF] Executed DbCommand (86ms) [Parameters=[@__email_0='?' (Size = 100)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FirstName], [u].[HashPassword], [u].[LastName], [u].[ModifiedAt], [u].[ResetToken], [u].[ResetTokenExpiry]
+FROM [Users] AS [u]
+WHERE [u].[Email] = @__email_0
+2026-07-08 23:53:42.005 +05:30 [INF] Executing OkObjectResult, writing value of type 'FundooNotes.Models.DTOs.ResponseDTO'.
+2026-07-08 23:53:42.005 +05:30 [INF] Executing OkObjectResult, writing value of type 'FundooNotes.Models.DTOs.ResponseDTO'.
+2026-07-08 23:53:42.019 +05:30 [INF] Executed action FundooNotes.Controllers.UserController.Login (FundooNotes) in 4078.1814ms
+2026-07-08 23:53:42.019 +05:30 [INF] Executed action FundooNotes.Controllers.UserController.Login (FundooNotes) in 1401.397ms
+2026-07-08 23:53:42.022 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-07-08 23:53:42.022 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-07-08 23:53:42.023 +05:30 [INF] HTTP POST /api/User/login responded 200 in 4159.6584 ms
+2026-07-08 23:53:42.024 +05:30 [INF] HTTP POST /api/User/login responded 200 in 1413.8655 ms
+2026-07-08 23:53:42.033 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/User/login - 200 null application/json; charset=utf-8 4186.1779ms
+2026-07-08 23:53:42.033 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/User/login - 200 null application/json; charset=utf-8 1429.4202ms
+2026-07-08 23:53:42.059 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:53:42.064 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:53:42.066 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/Notes/getall - 204 null null 7.5362ms
+2026-07-08 23:53:42.073 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/api/Notes/getall - null null
+2026-07-08 23:53:42.136 +05:30 [INF] CORS policy execution successful.
+2026-07-08 23:53:42.149 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes)'
+2026-07-08 23:53:42.158 +05:30 [INF] Route matched with {action = "GetAllNotes", controller = "Notes"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllNotes() on controller FundooNotes.Controllers.NotesController (FundooNotes).
+2026-07-08 23:53:56.604 +05:30 [INF] Executed action FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes) in 14442.4284ms
+2026-07-08 23:53:56.609 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.NotesController.GetAllNotes (FundooNotes)'
+2026-07-08 23:53:56.613 +05:30 [ERR] HTTP GET /api/Notes/getall responded 500 in 14475.2193 ms
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=HMGET, timeout: 5000, inst: 0, qu: 0, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 1, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=6,QueuedItems=0,CompletedItems=323,Timers=5), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAndRefreshAsync(String key, Boolean getData, CancellationToken token)
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAsync(String key, CancellationToken token)
+   at Microsoft.Extensions.Caching.Distributed.DistributedCacheExtensions.GetStringAsync(IDistributedCache cache, String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.GetAllNotes(Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 50
+   at FundooNotes.Controllers.NotesController.GetAllNotes() in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 39
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-07-08 23:53:56.683 +05:30 [ERR] An unhandled exception has occurred while executing the request.
+StackExchange.Redis.RedisConnectionException: The message timed out in the backlog attempting to send because no connection became available (5000ms) - Last Connection Exception: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout, command=HMGET, timeout: 5000, inst: 0, qu: 0, qs: 0, aw: False, bw: CheckingForTimeout, rs: NotStarted, ws: Idle, in: 0, in-pipe: 0, last-in: 0, cur-in: 0, sync-ops: 0, async-ops: 1, serverEndpoint: localhost:6379, conn-sec: n/a, aoc: 0, mc: 1/1/0, clientName: STUNNING(SE.Redis-v3.0.2.12632), IOCP: (Busy=0,Free=1000,Min=1,Max=1000), WORKER: (Busy=0,Free=32767,Min=16,Max=32767), POOL: (Threads=6,QueuedItems=0,CompletedItems=323,Timers=5), v: 3.0.2.12632 (Please take a look at this article for some common client-side issues that can cause timeouts: https://stackexchange.github.io/StackExchange.Redis/Timeouts)
+ ---> StackExchange.Redis.RedisConnectionException: It was not possible to connect to the redis server(s) localhost:6379/Interactive. ConnectTimeout
+   --- End of inner exception stack trace ---
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAndRefreshAsync(String key, Boolean getData, CancellationToken token)
+   at Microsoft.Extensions.Caching.StackExchangeRedis.RedisCache.GetAsync(String key, CancellationToken token)
+   at Microsoft.Extensions.Caching.Distributed.DistributedCacheExtensions.GetStringAsync(IDistributedCache cache, String key, CancellationToken token)
+   at FundooNotes.BusinessLogicLayer.Services.NotesService.GetAllNotes(Int32 userId) in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\BusinessLogicLayer\Services\NotesService.cs:line 50
+   at FundooNotes.Controllers.NotesController.GetAllNotes() in C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\Controllers\NotesController.cs:line 39
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeInnerFilterAsync>g__Awaited|13_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
+   at Microsoft.AspNetCore.Routing.EndpointMiddleware.<Invoke>g__AwaitRequestTask|7_0(Endpoint endpoint, Task requestTask, ILogger logger)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddlewareImpl.Invoke(HttpContext context)
+2026-07-08 23:53:56.700 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/api/Notes/getall - 500 null text/plain; charset=utf-8 14627.5091ms

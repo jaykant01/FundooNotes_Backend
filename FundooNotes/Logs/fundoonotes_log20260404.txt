@@ -1,0 +1,86 @@
+2026-04-04 12:00:25.132 +05:30 [INF] User profile is available. Using 'C:\Users\jayka\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-04 12:00:26.156 +05:30 [INF] Now listening on: https://localhost:7229
+2026-04-04 12:00:26.164 +05:30 [INF] Now listening on: http://localhost:5062
+2026-04-04 12:00:26.529 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-04 12:00:26.535 +05:30 [INF] Hosting environment: Development
+2026-04-04 12:00:26.542 +05:30 [INF] Content root path: C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes
+2026-04-04 12:00:33.364 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/index.html - null null
+2026-04-04 12:00:34.462 +05:30 [INF] HTTP GET /swagger/index.html responded 200 in 301.9161 ms
+2026-04-04 12:00:34.492 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/index.html - 200 null text/html;charset=utf-8 1154.8514ms
+2026-04-04 12:00:34.510 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - null null
+2026-04-04 12:00:34.510 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_vs/browserLink - null null
+2026-04-04 12:00:35.039 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - 200 14927 application/javascript; charset=utf-8 529.8073ms
+2026-04-04 12:00:35.509 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_vs/browserLink - 200 null text/javascript; charset=UTF-8 999.7455ms
+2026-04-04 12:00:35.593 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - null null
+2026-04-04 12:00:35.669 +05:30 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 48.0208 ms
+2026-04-04 12:00:35.689 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 97.9046ms
+2026-04-04 12:33:08.431 +05:30 [INF] User profile is available. Using 'C:\Users\jayka\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-04 12:33:09.075 +05:30 [INF] Now listening on: https://localhost:7229
+2026-04-04 12:33:09.079 +05:30 [INF] Now listening on: http://localhost:5062
+2026-04-04 12:33:09.498 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-04 12:33:09.500 +05:30 [INF] Hosting environment: Development
+2026-04-04 12:33:09.502 +05:30 [INF] Content root path: C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes
+2026-04-04 12:33:20.478 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/index.html - null null
+2026-04-04 12:33:21.006 +05:30 [INF] HTTP GET /swagger/index.html responded 200 in 147.0398 ms
+2026-04-04 12:33:21.027 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/index.html - 200 null text/html;charset=utf-8 564.0866ms
+2026-04-04 12:33:21.050 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_vs/browserLink - null null
+2026-04-04 12:33:21.050 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - null null
+2026-04-04 12:33:21.073 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - 200 14927 application/javascript; charset=utf-8 24.2308ms
+2026-04-04 12:33:21.321 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_vs/browserLink - 200 null text/javascript; charset=UTF-8 271.5954ms
+2026-04-04 12:33:21.358 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - null null
+2026-04-04 12:33:21.395 +05:30 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 28.5742 ms
+2026-04-04 12:33:21.403 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 44.836ms
+2026-04-04 12:37:50.904 +05:30 [INF] User profile is available. Using 'C:\Users\jayka\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-04 12:37:51.208 +05:30 [INF] Now listening on: https://localhost:7229
+2026-04-04 12:37:51.210 +05:30 [INF] Now listening on: http://localhost:5062
+2026-04-04 12:37:51.311 +05:30 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-04 12:37:51.316 +05:30 [INF] Hosting environment: Development
+2026-04-04 12:37:51.318 +05:30 [INF] Content root path: C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes
+2026-04-04 12:37:52.238 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/index.html - null null
+2026-04-04 12:37:52.708 +05:30 [INF] HTTP GET /swagger/index.html responded 200 in 147.1391 ms
+2026-04-04 12:37:52.722 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/index.html - 200 null text/html;charset=utf-8 498.9872ms
+2026-04-04 12:37:52.730 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - null null
+2026-04-04 12:37:52.730 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/_vs/browserLink - null null
+2026-04-04 12:37:52.746 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_framework/aspnetcore-browser-refresh.js - 200 14927 application/javascript; charset=utf-8 16.5754ms
+2026-04-04 12:37:52.798 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/_vs/browserLink - 200 null text/javascript; charset=UTF-8 68.6713ms
+2026-04-04 12:37:52.833 +05:30 [INF] Request starting HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - null null
+2026-04-04 12:37:52.884 +05:30 [INF] HTTP GET /swagger/v1/swagger.json responded 200 in 42.5218 ms
+2026-04-04 12:37:52.890 +05:30 [INF] Request finished HTTP/2 GET https://localhost:7229/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 57.1199ms
+2026-04-04 12:45:38.652 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/User/register - null null
+2026-04-04 12:45:38.748 +05:30 [INF] CORS policy execution successful.
+2026-04-04 12:45:38.763 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/User/register - 204 null null 115.508ms
+2026-04-04 12:45:38.775 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/User/register - application/json 122
+2026-04-04 12:45:38.796 +05:30 [INF] CORS policy execution successful.
+2026-04-04 12:45:38.831 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.UserController.Register (FundooNotes)'
+2026-04-04 12:45:38.954 +05:30 [INF] Route matched with {action = "Register", controller = "User"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Register(FundooNotes.Models.DTOs.UserRegisterDTO) on controller FundooNotes.Controllers.UserController (FundooNotes).
+2026-04-04 12:45:42.178 +05:30 [INF] Executed DbCommand (139ms) [Parameters=[@__email_0='?' (Size = 100)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FirstName], [u].[HashPassword], [u].[LastName], [u].[ModifiedAt], [u].[ResetToken], [u].[ResetTokenExpiry]
+FROM [Users] AS [u]
+WHERE [u].[Email] = @__email_0
+2026-04-04 12:45:43.016 +05:30 [INF] Executed DbCommand (46ms) [Parameters=[@p0='?' (DbType = DateTime2), @p1='?' (Size = 100), @p2='?' (Size = 50), @p3='?' (Size = 4000), @p4='?' (Size = 50), @p5='?' (DbType = DateTime2), @p6='?' (Size = 200), @p7='?' (DbType = DateTime2)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+INSERT INTO [Users] ([CreatedAt], [Email], [FirstName], [HashPassword], [LastName], [ModifiedAt], [ResetToken], [ResetTokenExpiry])
+OUTPUT INSERTED.[UserId]
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+2026-04-04 12:45:43.087 +05:30 [INF] Executing OkObjectResult, writing value of type 'FundooNotes.Models.DTOs.ResponseDTO'.
+2026-04-04 12:45:43.107 +05:30 [INF] Executed action FundooNotes.Controllers.UserController.Register (FundooNotes) in 4139.3586ms
+2026-04-04 12:45:43.111 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.UserController.Register (FundooNotes)'
+2026-04-04 12:45:43.114 +05:30 [INF] HTTP POST /api/User/register responded 200 in 4313.3124 ms
+2026-04-04 12:45:43.130 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/User/register - 200 null application/json; charset=utf-8 4355.6266ms
+2026-04-04 12:52:05.270 +05:30 [INF] Request starting HTTP/2 OPTIONS https://localhost:7229/api/User/login - null null
+2026-04-04 12:52:05.285 +05:30 [INF] CORS policy execution successful.
+2026-04-04 12:52:05.288 +05:30 [INF] Request finished HTTP/2 OPTIONS https://localhost:7229/api/User/login - 204 null null 53.4669ms
+2026-04-04 12:52:05.308 +05:30 [INF] Request starting HTTP/2 POST https://localhost:7229/api/User/login - application/json 52
+2026-04-04 12:52:05.339 +05:30 [INF] CORS policy execution successful.
+2026-04-04 12:52:05.346 +05:30 [INF] Executing endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-04-04 12:52:05.365 +05:30 [INF] Route matched with {action = "Login", controller = "User"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(FundooNotes.Models.DTOs.UserLoginDTO) on controller FundooNotes.Controllers.UserController (FundooNotes).
+2026-04-04 12:52:05.440 +05:30 [INF] Executed DbCommand (7ms) [Parameters=[@__email_0='?' (Size = 100)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[UserId], [u].[CreatedAt], [u].[Email], [u].[FirstName], [u].[HashPassword], [u].[LastName], [u].[ModifiedAt], [u].[ResetToken], [u].[ResetTokenExpiry]
+FROM [Users] AS [u]
+WHERE [u].[Email] = @__email_0
+2026-04-04 12:52:05.962 +05:30 [INF] Executing OkObjectResult, writing value of type 'FundooNotes.Models.DTOs.ResponseDTO'.
+2026-04-04 12:52:05.975 +05:30 [INF] Executed action FundooNotes.Controllers.UserController.Login (FundooNotes) in 602.2222ms
+2026-04-04 12:52:05.979 +05:30 [INF] Executed endpoint 'FundooNotes.Controllers.UserController.Login (FundooNotes)'
+2026-04-04 12:52:05.981 +05:30 [INF] HTTP POST /api/User/login responded 200 in 635.6268 ms
+2026-04-04 12:52:05.985 +05:30 [INF] Request finished HTTP/2 POST https://localhost:7229/api/User/login - 200 null application/json; charset=utf-8 679.3087ms
