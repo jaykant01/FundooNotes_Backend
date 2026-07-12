@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://15.206.69.217")  // Angular dev server
+        policy.WithOrigins("http://13.202.26.137")  // Angular dev server
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
