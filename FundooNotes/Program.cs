@@ -128,7 +128,23 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<FundooContext>();
-    db.Database.Migrate();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    var retries = 5;
+    for (int i = 1; i <= retries; i++)
+    {
+        try
+        {
+            db.Database.Migrate();
+            break;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Migration attempt {Attempt}/{Retries} failed", i, retries);
+            if (i == retries) throw;
+            Thread.Sleep(TimeSpan.FromSeconds(5));
+        }
+    }
 }
 
 app.UseCors("AllowAngular");

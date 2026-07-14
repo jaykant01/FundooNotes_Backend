@@ -358,3 +358,4 @@ C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\obj\Debug\net8.0\refint\Fu
 C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\obj\Debug\net8.0\FundooNotes.pdb
 C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\obj\Debug\net8.0\FundooNotes.genruntimeconfig.cache
 C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\obj\Debug\net8.0\ref\FundooNotes.dll
+C:\Users\jayka\Desktop\FundoNotes Backend\FundooNotes\obj\Debug\net8.0\FundooNotes.sourcelink.json
